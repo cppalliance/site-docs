@@ -16,7 +16,7 @@ Boost has been incorporating GitHub Actions into its testing workflows. This is 
 
 . After the workflow runs, GitHub Actions reports the result. If any step in the workflow fails, the failure is reported, which helps developers to quickly identify and address issues. The status of each workflow run is displayed on the GitHub interface, allowing anyone to quickly check the status of the project.
 
-Boost also uses GitHub Actions support for matrix builds (allowing Boost to run the same build steps on multiple combinations of operating systems, compilers, etc.), caching of dependencies to speed up builds, and the ability to create custom actions.
+Boost also uses GitHub Actions support for _matrix builds_ (allowing Boost to run the same build steps on multiple combinations of operating systems, compilers, etc.), caching of dependencies to speed up builds, and the ability to create custom actions.
 
 === Example GitHub Workflows
 
@@ -36,7 +36,15 @@ Refer to:
 
 Drone is an open-source CI system built on container technology. Each step in a Drone build usually runs in its own Docker container, allowing it to use any language, tool, or service that can run inside a Docker container. This offers excellent environment consistency and isolation between steps. You can run your Drone pipelines locally on your machine for testing purposes before pushing changes to your repository.
 
-. Drone uses a file named `.drone.jsonnet` or `.drone.star`, and a `.drone` folder, at the root of the repository to define the build pipeline, including the environment, build steps, and notification settings. The environment is typically a Docker container, allowing for a high degree of flexibility and customization.
+Drone can use a simple YAML configuration file, `.drone.yml`, placed at the root of your git repository. However, as pipelines grow in complexity, managing them with YAML can become challenging. This is where `.drone.jsonnet` and .`drone.star` files come in, which are associated with the https://jsonnet.org/[Jsonnet] and https://github.com/bazelbuild/starlark[Starlark] scripting languages respectively. They both serve the purpose of creating more dynamic, reusable, and maintainable pipeline configurations.
+
+* https://jsonnet.org/[Jsonnet] is a data templating language for app configuration. It is a superset of JSON and allows for custom scripting to dynamically produce JSON (and by extension, YAML). With `.drone.jsonnet`, you can create advanced pipeline configurations that aren't feasible with static YAML files.
+
+* https://github.com/bazelbuild/starlark[Starlark] is a Python-inspired language that was created by Google and is used for configuring Bazel build systems. Similar to Jsonnet, it allows you to create more complex and maintainable pipeline configurations.
+
+Both Jsonnet and Starlark allow you to use logic like conditionals and loops in your configuration files, making them a powerful tool for complex CI/CD pipelines. If your team has Python experience, for example, Starlark's Python-like syntax might be a better choice. If you're working in a JSON-heavy environment, Jsonnet might be more suitable.
+
+. Drone uses a file named `.drone.yml`, `.drone.jsonnet` or `.drone.star`, and a `.drone` folder, at the root of the repository to define the build pipeline, including the environment, build steps, and notification settings. The environment is typically a Docker container, allowing for a high degree of flexibility and customization.
 
 . When changes are pushed to the repository, Drone automatically runs the build pipeline defined in the `.drone` file. This  involves building the software and running a suite of tests.
 
@@ -44,17 +52,23 @@ Drone is an open-source CI system built on container technology. Each step in a 
 
 Drone also includes support for matrix builds, secrets management (for handling sensitive data), and plugins (for extending functionality).
 
-=== Example .drone Files
+=== Example .drone.jsonnet Files
 
 Refer to:
 
 * https://github.com/boostorg/smart_ptr/blob/13be03abf880cdb616d0597c38880f53f1b415b8/.drone.jsonnet[Smart Pointer library .drone.jsonnet]
 
-* https://github.com/boostorg/type_traits/blob/89f5011b4a79d91e42735670e39f72cb25c86c72/.drone.star[Type Traits library .drone.star]
-
 * https://github.com/boostorg/variant2/blob/e2546b70ca04d4263f7a5917815506e488b6920f/.drone.jsonnet[Variant2 library .drone.jsonnet]
 
 * https://github.com/boostorg/unordered/blob/9a7d1d336aaa73ad8e5f7c07bdb81b2e793f8d93/.drone.jsonnet[Unordered library .drone.jsonnet]
+
+=== Example .drone.star Files
+
+Refer to:
+
+* https://github.com/boostorg/exception/blob/b039b4ea18ef752d0c1684b3f715ce493b778060/.drone.star[Exception library .drone.star]
+
+* https://github.com/boostorg/type_traits/blob/89f5011b4a79d91e42735670e39f72cb25c86c72/.drone.star[Type Traits library .drone.star]
 
 * https://github.com/boostorg/yap/blob/ae49bf2744586e6bd6c0cedff4500a58a4386860/.drone.star[Yap library .drone.star]
 
@@ -118,7 +132,7 @@ Refer to:
 
 CircleCI is a CI/CD platform that supports a wide range of languages, tools, and services, making it flexible for different testing requirements. It is less commonly used than <<Travis CI>> or <<AppVeyor>>, but is used by the Super-project and a few libraries.
 
-. CircleCI uses a file named `config.yml` stored in a directory called `.circleci` at the root of the repository. This file defines the build environment and steps, such as which Docker images to use, dependencies to install, and the commands for building and testing.
+. CircleCI uses a file named `config.yml` stored in a directory called `.circleci` at the root of the repository. This file defines the build environment and steps, such as which <<Docker>> images to use, dependencies to install, and the commands for building and testing.
 
 . Upon changes being pushed to the repository or on a schedule, CircleCI automatically executes the instructions in the `config.yml` file. This usually includes building the project and running the test suite.
 
@@ -144,6 +158,165 @@ Refer to:
 
 Other CI systems can be implemented by library developers. For example, https://learn.microsoft.com/en-us/azure/devops/pipelines/?view=azure-devops[Azure Pipelines] is a cloud service provided by Microsoft to automatically build, test, and deploy applications.
 
+== Test with Popular Compilers
+
+Your CI test matrix should include one or more of the most popular compilers for each supported OS.
+
+=== Windows
+
+* https://visualstudio.microsoft.com/downloads/[Microsoft Visual C++] (MSVC): This is Microsoft's own compiler that comes with Visual Studio. It has excellent support for Windows-specific development and great debugging tools.
+
+* https://sourceforge.net/projects/mingw/[MinGW - Minimalist GNU for Windows]: MinGW includes a port of the GCC (GNU Compiler Collection), which includes a pass:[C++] compiler. It's useful for open-source projects and cross-platform development.
+
+* https://clang.llvm.org/[Clang]: Clang is a compiler front end for the C, pass:[C++], and Objective-C programming languages. It uses LLVM as its back end and has been part of the LLVM release cycle since LLVM 2.6.
+
+=== Linux
+
+* https://gcc.gnu.org/[GCC, the GNU Compiler Collection]: GCC is one of the most popular compilers for Linux. It supports multiple programming languages but is most often used as a pass:[C++] compiler. It's open-source and is the default compiler on most Linux distributions.
+
+* https://clang.llvm.org/[Clang]: Clang, part of the LLVM project, is a pass:[C++] compiler that provides a number of advantages over GCC, such as faster compile times and improved performance. It's also known for providing more understandable compile errors.
+
+* https://www.intel.com/content/www/us/en/developer/articles/news/intel-c-compiler-classic-2021-2-1-release.html[Intel Compiler]: While not as common for general use as GCC or Clang, the Intel pass:[C++] Compiler can produce highly optimized code, especially for parallel computation and vector operations. It's often used in high-performance computing scenarios.
+
+=== MacOS
+
+* Clang is the default compiler for macOS and is provided with https://developer.apple.com/xcode/resources/[Xcode], Apple's integrated development environment. It's known for providing more understandable compile errors and faster compile times compared to GCC.
+
+* https://gcc.gnu.org/[GCC, the GNU Compiler Collection]: While not the default, GCC can also be used on macOS. It's typically installed via a package manager like Homebrew. However, it's worth noting that when you install GCC on a Mac, the default "gcc" command often still points to Clang for compatibility reasons, so you might need to use a version-specific command like "gcc-9" to use the real GCC.
+
+* https://www.intel.com/content/www/us/en/developer/articles/news/intel-c-compiler-classic-2021-2-1-release.html[Intel Compiler]: The Intel pass:[C++] Compiler is also available on macOS and can produce highly optimized code, especially for parallel computation and vector operations. Like on Linux, it's often used in high-performance computing scenarios.
+
+== Sanitize your Code
+
+Consider using a code sanitizer to check for some of the more mundane, but nevertheless real, bugs and inefficiencies in your library.
+
+All the tools listed have different strengths and are useful in different scenarios, so you might want to use several of them in combination.
+
+=== Valgrind
+
+For Linux based systems, https://valgrind.org/docs/manual/quick-start.html[Valgrind] is an open-source software tool suite that helps in debugging memory management and threading bugs, and profiling programs. It is often used to detect memory leaks and uninitialised memory blocks in pass:[C++] programs, among other things.
+
+Here's how you can set it up for your project:
+
+. Depending on your OS, the command will differ. For Ubuntu or Debian, you can use:
++
+[source,txt]
+----
+sudo apt-get install valgrind
+----
++
+For CentOS or Fedora, you can use:
++
+[source,txt]
+----
+sudo yum install valgrind
+----
+
+. After Valgrind is installed, you can use it to run your program. Here's an example:
++
+[source,txt]
+----
+valgrind --leak-check=yes ./your_program
+----
++
+The `--leak-check=yes` option tells Valgrind to perform memory leak checks. Your program runs as usual, but with Valgrind checking its memory usage in the background.
+
+Setting up Valgrind in a CI environment depends on your CI system and might look something like this:
+
+. In your CI configuration file, such as .travis.yml for <<Travis CI>>, or .github/workflows/workflow.yml for <<GitHub Actions>>, you would add a step to install Valgrind in your build environment.
+
+. Next, in your script steps, instead of running your test executable directly, you'd use Valgrind to run it. This will generate a report of any memory issues detected by Valgrind.
+
+NOTE:: Valgrind can significantly slow down your program, so it might not be suitable for all CI use cases, especially for large projects or tests that need to run quickly.
+
+=== AddressSanitizer
+
+https://learn.microsoft.com/en-us/cpp/sanitizers/asan?view=msvc-170[AddressSanitizer (ASan)] is a fast memory error detector built into LLVM/Clang, gcc and other compilers. As such, it works on Windows, Linux, and MacOS. It can detect out-of-bounds accesses to heap, stack, and globals, use-after-free and use-after-return bugs, and other memory-related errors. AddressSanitizer is generally faster than Valgrind and can be used in continuous integration without significantly slowing down the test suite.
+
+The AddressSanitizer suite also includes:
+
+* UndefinedBehaviorSanitizer (UBSan), which is a runtime undefined behavior detector that can catch misaligned or null pointers, integer overflows, and invalid bit shifts.
+
+* MemorySanitizer (MSan) detects uninitialized reads. This tool is similar to Valgrind, but it's generally faster and can catch some bugs that Valgrind might miss.
+
+* ThreadSanitizer (TSan) detects data races. It's available in Clang and gcc.
+
+* LeakSanitizer (LSan) is a memory leak detector. It's integrated into AddressSanitizer, but there's also a standalone version that can be used with other tools.
+
+=== Cppcheck
+
+http://cppcheck.net/[Cppcheck], versions of which also run on Windows, Linux, and MacOS, is a static analysis tool for pass:[C++] code. It doesn't require the code to be executed, so it can catch bugs at compile-time that might be missed at runtime. It can check for memory leaks, null pointer dereferences, syntax errors, and other issues.
+
+== Improve CI Performance
+
+This section provides some insight into how you might use precompiled headers (PCHs), https://ccache.dev/[CCache], or https://docs.docker.com/get-docker/[Docker] to reduce continuous integration times.
+
+=== Precompiled Headers
+
+Precompiled headers can help reduce build times by precompiling certain parts of your codebase that are unlikely to change between builds, such as header files from libraries you're using or project-wide header files. Here's a basic example of how to set it up in a CMake project:
+
+[source, txt]
+----
+# In your CMakeLists.txt
+target_precompile_headers(your_project PRIVATE pch.h)
+----
+
+Then, in `pch.h`, you'd include headers that are used throughout your project and don't change often. Note that the usage of precompiled headers is highly dependent on the build system you're using (CMake, Meson, etc.) and the compiler.
+
+=== CCache
+
+https://ccache.dev/[CCache] is a compiler cache. It speeds up recompilation of pass:[C++] code by caching previous compilations and reusing them when the same compilation is done again.
+
+Here's a simple example of how to use it in a CI environment:
+
+. In your CI configuration file, add a step to install CCache. This will depend on the specific OS you're using in your CI environment. For Ubuntu or Debian, you can use:
++
+[source,txt]
+----
+sudo apt-get install ccache
+----
+
+. You'll need to prepend ccache to your compiler commands to use the cache. In a CMake-based project, you might do something like this in your CI configuration file:
++
+[source,txt]
+----
+export CXX="ccache g++" CC="ccache gcc"
+cmake ..
+make
+----
+
+. You may want to adjust cache settings depending on your project's needs. For instance, you might set `max_size` to control the maximum size of the cache:
++
+[source,txt]
+----
+ccache --max-size=2G
+----
++
+Or set sloppiness to control what aspects of the build can vary while still using the cache:
++
+[source,txt]
+----
+ccache --set-config=sloppiness=pch_defines,time_macros
+----
+
+=== Docker
+
+https://docs.docker.com/get-docker/[Docker] can be used to potentially reduce CI times, but it's important to understand that Docker isn't inherently a performance-boosting tool. Rather, it provides consistency and isolation for your applications, which indirectly may lead to improved CI times. Here are some ways Docker can help:
+
+* Docker helps maintain consistent environments across the development and testing life cycle. It eliminates the "it works on my machine" problem by packaging the application along with its entire environment into a container. This can reduce the time spent resolving environmental issues and bugs.
+
+* Docker uses layer caching. If you have a Dockerfile that first installs dependencies and then adds your code, Docker will cache the dependencies layer. In subsequent builds, as long as the dependencies don't change, Docker can reuse the cached layer, speeding up the build process.
+
+* Docker allows for easy parallelization of tests. Each test can run in its own container, isolated from the others, and potentially on its own host machine. This can significantly reduce the time it takes to run a large test suite.
+
+* Docker images with pre-installed dependencies can be built and pushed to a Docker registry. These images can then be pulled and used during the CI process, saving time on environment setup.
+
+However, it's worth noting that using Docker can also _add_ overhead to your CI process. Building Docker images and setting up containers can take time, particularly if not managed efficiently. It's important to leverage Docker's layer caching and use efficient Dockerfile strategies to ensure you're not unnecessarily slowing down your CI process.
+
+Docker is often used in conjunction with <<CircleCI>>.
+
 == See Also
 
 * xref:version-control.adoc[]
+
+* xref:testing/writing-tests.adoc[]
