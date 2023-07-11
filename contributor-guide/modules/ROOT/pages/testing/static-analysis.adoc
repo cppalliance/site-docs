@@ -1,0 +1,56 @@
+= Static Analysis
+:navtitle: Static Analysis
+
+Static analysis is a method of debugging by examining source code before a program is run. It's done by analyzing a set of code against a set (or multiple sets) of coding rules. This type of analysis addresses weaknesses in source code that might lead to vulnerabilities. The objective is to find errors, bugs, or deviations from best practices early in the development process to improve code quality and maintainability.
+
+Here are a few key characteristics of static analysis:
+
+* Static analysis is performed without actually executing the code. It reviews the code in its non-runtime, static state.
+
+* Many static analysis methods are automated. Automated tools can quickly scan large codebases and identify potential issues based on predefined rules or patterns.
+
+* Static analysis tools can detect a variety of issues, including syntax errors, type safety issues, race conditions, unused code, memory leaks, and other potential vulnerabilities.
+
+* Static analysis can help ensure that code adheres to coding standards and guidelines.
+
+* Besides looking for bugs or vulnerabilities, static analysis tools often compute metrics that give an overall impression of code quality, like cyclomatic complexity, code duplication, or code comments ratio.
+
+Because it's performed early in the software development lifecycle - often as part of an integrated development environment (IDE) or CI pipeline - static analysis helps developers catch and fix issues early, which can save time and resources. Refer to the xref:testing/continuous-integration.adoc#_coverity_scan[Coverity Scan] documentation.
+
+== Treat Warnings as Errors
+
+One of the most important things for library developers to do is to turn on compiler settings to treat Warnings as Errors. In practice, some of these warnings will need to be whitelisted as they will be false positives. Otherwise, most warnings should be addressed as errors.
+
+== Stand-alone Static Analysis Tools
+
+xref:testing/continuous-integration.adoc#_coverity_scan[Coverity Scan] is an example of a static analysis tool that is usually integrated into the Boost CI process. Here are some tools that are more often used as stand-alone tools:
+
+=== Cppcheck
+
+http://cppcheck.net/[Cppcheck], versions of which also run on Windows, Linux, and MacOS, is a static analysis tool for pass:[C++] code. It doesn't require the code to be executed, so it can catch bugs at compile-time that might be missed at runtime. It can check for memory leaks, null pointer dereferences, syntax errors, and other issues.
+
+=== Clang Static Analyzer
+
+Part of the LLVM project, https://clang-analyzer.llvm.org/[Clang Static Analyzer] is open-source and checks a variety of issues, including dead stores (writing data that is never read), use after free, null pointer dereferences, and more.
+
+=== PVS-Studio
+
+https://pvs-studio.com/en/pvs-studio/[PVS-Studio] is a commercial static code analyzer that can detect errors in source code, and is noted for its ability to catch subtle programming errors that can lead to serious issues.
+
+=== SonarQube
+
+https://www.sonarsource.com/products/sonarqube/[SonarQube] is an open-source platform for continuous inspection of code quality. SonarQube provides reports on duplicated code, coding standards, unit tests, code coverage, code complexity, comments, bugs, and security vulnerabilities.
+
+=== Visual Studio's Code Analysis Tool
+
+If you're using https://visualstudio.microsoft.com/[Microsoft's Visual Studio] for development, you have built-in support for static analysis. Visual Studio's Code Analysis tool can help you detect and correct issues, such as potential defects, deviations from best practices, incorrect usage of the Standard Library, etc.
+
+=== Infer
+
+Developed by Facebook, https://fbinfer.com/[Infer] is a static analysis tool that can catch null pointer exceptions, resource leaks, and more. 
+
+== See Also
+
+* xref:testing/continuous-integration.adoc[]
+
+* xref:testing/boost-test-matrix.adoc[]
